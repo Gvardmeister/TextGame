@@ -1,6 +1,8 @@
 package game
 
 import (
+	"strings"
+
 	"github.com/Gvardmeister/TextGame/internal/domain/player"
 	"github.com/Gvardmeister/TextGame/internal/domain/room"
 )
@@ -57,5 +59,31 @@ func (g *Game) InitGame() {
 }
 
 func handleCommand(command string) string {
-	return ""
+	if theGame == nil {
+		initGame()
+	}
+
+	parts := strings.Split(command, " ")
+
+	switch parts[0] {
+	case "осмотреться":
+		return theGame.Player.LookAround()
+	case "идти":
+		if len(parts) < 2 {
+			return "параметр для перемещения - отсутствует."
+		}
+		return theGame.Player.MoveTo(parts[1])
+	case "взять":
+		if len(parts) < 2 {
+			return "параметр для взятия объекта - отсутствует."
+		}
+		return theGame.Player.TakeItem(parts[1])
+	case "применить":
+		if len(parts) < 3 {
+			return "параметры для применения - отсутствуют."
+		}
+		return theGame.Player.UseItem(parts[1], parts[2])
+	default:
+		return "неизвестная команда"
+	}
 }

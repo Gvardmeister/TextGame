@@ -15,3 +15,19 @@ func NewPlayer(startRoom *room.Room) *Player {
 		Equipped:    make(map[string]bool),
 	}
 }
+
+func (p *Player) LookAround() string {
+	return ""
+}
+
+func (p *Player) MoveTo(roomName string) string {
+	return ""
+}
+
+func (p *Player) TakeItem(item string) string {
+	return ""
+}
+
+func (p *Player) UseItem(item, target string) string {
+	return ""
+}
