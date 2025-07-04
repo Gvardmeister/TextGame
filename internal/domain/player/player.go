@@ -1,6 +1,12 @@
 package player
 
-import "github.com/Gvardmeister/TextGame/internal/domain/room"
+import (
+	"fmt"
+	"sort"
+	"strings"
+
+	"github.com/Gvardmeister/TextGame/internal/domain/room"
+)
 
 type Player struct {
 	CurrentRoom *room.Room
@@ -17,7 +23,68 @@ func NewPlayer(startRoom *room.Room) *Player {
 }
 
 func (p *Player) LookAround() string {
-	return ""
+	room := p.CurrentRoom
+
+	items := make([]string, 0, len(room.Items))
+	for item := range room.Items {
+		items = append(items, item)
+	}
+	sort.Strings(items)
+
+	description := ""
+
+	switch room.Name {
+	case "кухня":
+		description += "ты находишься на кухне, "
+		if len(items) > 0 {
+			description += fmt.Sprintf("на столе: %s, надо собрать рюкзак и идти в универ", strings.Join(items, ", "))
+		} else {
+			description = "надо идти в универ"
+		}
+	case "комната":
+		if len(items) == 0 {
+			description = "пустая комната."
+		} else {
+			stol := []string{}
+			stul := []string{}
+
+			for _, item := range items {
+				if item == "рюкзак" {
+					stul = append(stul, item)
+				} else {
+					stol = append(stol, item)
+				}
+			}
+
+			parts := []string{}
+			if len(stol) > 0 {
+				parts = append(parts, fmt.Sprintf("на столе: %s", strings.Join(stol, ", ")))
+			}
+			if len(stul) > 0 {
+				parts = append(parts, fmt.Sprintf("на стуле: %s", strings.Join(stul, ", ")))
+			}
+			description += strings.Join(parts, ", ")
+		}
+	default:
+		if len(items) > 0 {
+			description += fmt.Sprintf("на полу: %s", strings.Join(items, ", "))
+		} else {
+			description = "ничего интересного"
+		}
+	}
+
+	exits := make([]string, 0, len(room.ConnectionsRoom))
+	for name := range room.ConnectionsRoom {
+		exits = append(exits, name)
+	}
+	sort.Strings(exits)
+	exitsDescrip := fmt.Sprintf("можно пройти - %s", strings.Join(exits, ", "))
+
+	if description != "" {
+		return fmt.Sprintf("%s. %s", description, exitsDescrip)
+	}
+
+	return exitsDescrip
 }
 
 func (p *Player) MoveTo(roomName string) string {
