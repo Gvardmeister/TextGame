@@ -88,7 +88,37 @@ func (p *Player) LookAround() string {
 }
 
 func (p *Player) MoveTo(roomName string) string {
-	return ""
+	room := p.CurrentRoom
+
+	targetRoom, ok := room.ConnectionsRoom[roomName]
+	if !ok {
+		return fmt.Sprintf("нет пути в %s", roomName)
+	}
+
+	if roomName == "улица" && !p.HasItem("ключи") {
+		return "дверь закрыта"
+	}
+
+	p.CurrentRoom = targetRoom
+
+	switch roomName {
+	case "комната":
+		return "ты в своей комнате. можно пройти - коридор"
+	case "кухня":
+		return "кухня, ничего интересного. можно пройти - коридор"
+	case "улица":
+		return "на улице весна. можно пройти - домой"
+	default:
+		order := []string{"кухня", "комната", "улица"}
+		exits := []string{}
+		for _, name := range order {
+			if _, ok := targetRoom.ConnectionsRoom[name]; ok {
+				exits = append(exits, name)
+			}
+		}
+
+		return fmt.Sprintf("ничего интересного. можно пройти - %s", strings.Join(exits, ", "))
+	}
 }
 
 func (p *Player) TakeItem(item string) string {
@@ -97,4 +127,8 @@ func (p *Player) TakeItem(item string) string {
 
 func (p *Player) UseItem(item, target string) string {
 	return ""
+}
+
+func (p *Player) HasItem(item string) bool {
+	return p.Inventory[item]
 }
