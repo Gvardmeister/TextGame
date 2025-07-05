@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Gvardmeister/TextGame/internal/domain/room"
+	"github.com/Gvardmeister/TextGame/internal/domain/state"
 )
 
 type Player struct {
@@ -95,7 +96,7 @@ func (p *Player) MoveTo(roomName string) string {
 		return fmt.Sprintf("нет пути в %s", roomName)
 	}
 
-	if roomName == "улица" && !p.HasItem("ключи") {
+	if roomName == "улица" && !state.DoorOpened {
 		return "дверь закрыта"
 	}
 
@@ -148,6 +149,8 @@ func (p *Player) UseItem(item, target string) string {
 
 	if item == "ключи" && target == "дверь" {
 		if _, ok := p.CurrentRoom.ConnectionsRoom["улица"]; ok {
+			state.DoorOpened = true
+
 			return "дверь открыта"
 		}
 
