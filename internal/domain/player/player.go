@@ -43,7 +43,7 @@ func (p *Player) LookAround() string {
 		}
 	case "комната":
 		if len(items) == 0 {
-			description = "пустая комната."
+			description = "пустая комната"
 		} else {
 			stol := []string{}
 			stul := []string{}
@@ -139,7 +139,22 @@ func (p *Player) TakeItem(item string) string {
 }
 
 func (p *Player) UseItem(item, target string) string {
-	return ""
+	item = strings.ToLower(item)
+	target = strings.ToLower(target)
+
+	if !p.HasItem(item) {
+		return fmt.Sprintf("нет предмета в инвентаре - %s", item)
+	}
+
+	if item == "ключи" && target == "дверь" {
+		if _, ok := p.CurrentRoom.ConnectionsRoom["улица"]; ok {
+			return "дверь открыта"
+		}
+
+		return "не к чему применить"
+	}
+
+	return "не к чему применить"
 }
 
 func (p *Player) HasItem(item string) bool {
