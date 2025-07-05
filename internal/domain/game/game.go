@@ -64,25 +64,33 @@ func handleCommand(command string) string {
 	}
 
 	parts := strings.Split(command, " ")
+	if len(parts) == 0 {
+		return "пустая комната"
+	}
 
-	switch parts[0] {
+	switch strings.ToLower(parts[0]) {
 	case "осмотреться":
 		return theGame.Player.LookAround()
 	case "идти":
 		if len(parts) < 2 {
 			return "параметр для перемещения - отсутствует."
 		}
-		return theGame.Player.MoveTo(parts[1])
+		return theGame.Player.MoveTo(strings.ToLower(parts[1]))
 	case "взять":
 		if len(parts) < 2 {
 			return "параметр для взятия объекта - отсутствует."
 		}
-		return theGame.Player.TakeItem(parts[1])
+		return theGame.Player.TakeItem(strings.ToLower(parts[1]))
 	case "применить":
 		if len(parts) < 3 {
 			return "параметры для применения - отсутствуют."
 		}
-		return theGame.Player.UseItem(parts[1], parts[2])
+		return theGame.Player.UseItem(strings.ToLower(parts[1]), strings.ToLower(parts[2]))
+	case "надеть":
+		if len(parts) < 2 {
+			return "параметр для надевания - отсутствует."
+		}
+		return theGame.Player.EquipItem(strings.ToLower(parts[1]))
 	default:
 		return "неизвестная команда"
 	}

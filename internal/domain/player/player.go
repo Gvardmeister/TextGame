@@ -122,7 +122,20 @@ func (p *Player) MoveTo(roomName string) string {
 }
 
 func (p *Player) TakeItem(item string) string {
-	return ""
+	room := p.CurrentRoom
+
+	if !room.Items[item] {
+		return "нет такого"
+	}
+
+	if !p.Equipped["рюкзак"] && item != "рюкзак" {
+		return "некуда класть"
+	}
+
+	p.Inventory[item] = true
+	delete(room.Items, item)
+
+	return fmt.Sprintf("предмет добавлен в инвентарь: %s", item)
 }
 
 func (p *Player) UseItem(item, target string) string {
@@ -131,4 +144,27 @@ func (p *Player) UseItem(item, target string) string {
 
 func (p *Player) HasItem(item string) bool {
 	return p.Inventory[item]
+}
+
+func (p *Player) EquipItem(item string) string {
+	item = strings.ToLower(item)
+
+	if p.Equipped[item] {
+		return "уже надето"
+	}
+
+	if p.HasItem(item) {
+		p.Equipped[item] = true
+
+		return fmt.Sprintf("вы надели: %s", item)
+	}
+
+	if p.CurrentRoom.Items[item] {
+		delete(p.CurrentRoom.Items, item)
+		p.Equipped[item] = true
+
+		return fmt.Sprintf("вы надели: %s", item)
+	}
+
+	return "нет такого"
 }
