@@ -1,4 +1,4 @@
-package player_interface
+package interfaces
 
 type Person interface {
 	// Для проверки состояния и управления
