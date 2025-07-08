@@ -38,10 +38,15 @@ func (p *Player) LookAround() string {
 	case "кухня":
 		description += "ты находишься на кухне, "
 		if len(items) > 0 {
-			description += fmt.Sprintf("на столе: %s, надо собрать рюкзак и идти в универ", strings.Join(items, ", "))
-		} else {
-			description = "надо идти в универ"
+			description += fmt.Sprintf("на столе: %s, ", strings.Join(items, ", "))
 		}
+
+		if p.HasItem("рюкзак") || p.Equipped["рюкзак"] {
+			description += "надо идти в универ"
+		} else {
+			description += "надо собрать рюкзак и идти в универ"
+		}
+
 	case "комната":
 		if len(items) == 0 {
 			description = "пустая комната"
