@@ -5,6 +5,7 @@ import (
 
 	"github.com/Gvardmeister/TextGame/internal/domain/player"
 	"github.com/Gvardmeister/TextGame/internal/domain/room"
+	"github.com/Gvardmeister/TextGame/internal/domain/state"
 )
 
 var theGame *Game
@@ -15,8 +16,9 @@ func initGame() {
 }
 
 type Game struct {
-	Player *player.Player
-	Rooms  map[string]*room.Room
+	Player     *player.Player
+	Rooms      map[string]*room.Room
+	StreetRoom *room.Room
 }
 
 func NewGame() *Game {
@@ -26,6 +28,8 @@ func NewGame() *Game {
 }
 
 func (g *Game) InitGame() {
+	state.DoorOpened = false
+
 	// Создание кухни
 	kitchen := room.NewRoom("кухня")
 	kitchen.Items["чай"] = true
@@ -55,7 +59,8 @@ func (g *Game) InitGame() {
 	g.Rooms["улица"] = street
 
 	// Создание игрока
-	g.Player = player.NewPlayer(kitchen)
+	g.Player = player.NewPlayer(kitchen, street)
+	g.StreetRoom = street
 }
 
 func handleCommand(command string) string {

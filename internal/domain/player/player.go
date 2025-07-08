@@ -13,13 +13,15 @@ type Player struct {
 	CurrentRoom *room.Room
 	Inventory   map[string]bool
 	Equipped    map[string]bool
+	StreetRoom  *room.Room
 }
 
-func NewPlayer(startRoom *room.Room) *Player {
+func NewPlayer(startRoom *room.Room, street *room.Room) *Player {
 	return &Player{
 		CurrentRoom: startRoom,
 		Inventory:   make(map[string]bool),
 		Equipped:    make(map[string]bool),
+		StreetRoom:  street,
 	}
 }
 
@@ -37,6 +39,7 @@ func (p *Player) LookAround() string {
 	switch room.Name {
 	case "кухня":
 		description += "ты находишься на кухне, "
+
 		if len(items) > 0 {
 			description += fmt.Sprintf("на столе: %s, ", strings.Join(items, ", "))
 		}
@@ -96,13 +99,13 @@ func (p *Player) LookAround() string {
 func (p *Player) MoveTo(roomName string) string {
 	room := p.CurrentRoom
 
+	if roomName == "улица" && !state.DoorOpened {
+		return "дверь закрыта"
+	}
+
 	targetRoom, ok := room.ConnectionsRoom[roomName]
 	if !ok {
 		return fmt.Sprintf("нет пути в %s", roomName)
-	}
-
-	if roomName == "улица" && !state.DoorOpened {
-		return "дверь закрыта"
 	}
 
 	p.CurrentRoom = targetRoom
@@ -153,12 +156,11 @@ func (p *Player) UseItem(item, target string) string {
 	}
 
 	if item == "ключи" && target == "дверь" {
-		if _, ok := p.CurrentRoom.ConnectionsRoom["улица"]; ok {
+		if p.CurrentRoom.Name == "коридор" {
 			state.DoorOpened = true
 
 			return "дверь открыта"
 		}
-
 		return "не к чему применить"
 	}
 
